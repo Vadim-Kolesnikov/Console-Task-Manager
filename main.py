@@ -1,17 +1,8 @@
-from interface import Interface
-import os
+from task_manager import TaskManager
+from utils.system_utils import search_data_path
 
-
-listdir = os.listdir()
-
-data_path = None
-for path in listdir:
-    if path.endswith('.json'):
-        data_path = path
+data_path = search_data_path
         
-if not data_path:
-    data_path = 'data.json'
-        
-interface = Interface(data_path)
+interface = TaskManager(data_path)
 
 interface.start()

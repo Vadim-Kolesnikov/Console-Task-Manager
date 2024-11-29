@@ -1,5 +1,7 @@
-from manager import TaskManager, FileManager
-from utils import *
+from task_list import TaskList, JsonFileManager
+from utils.input_utils import *
+from utils.task_list_utils import show_tasks
+from utils.system_utils import clean_console
 import os
 
 option_input_message = 'Выберите действие (1 - Просмотреть задачи; 2 - Добавить задачу; 3 - Изменить задачу; 4 - Удалить задачу; 5 - Настройки; 6 - прервать выполнение программы): '
@@ -10,11 +12,11 @@ change_task_fields_message = 'Введите значения для полей 
 option_error_message = 'Такой опции не существует.'
 setting_option_input_message = 'Выберите что хотите изменить (1 - директорию; 2 - тип сохраняемых данных): '
 
-class Interface:
+class TaskManager:
     def __init__(self, data_path):
         self.data_path = data_path
-        self.file_manager = FileManager(data_path)
-        self.manager = TaskManager(self.file_manager)
+        self.file_manager = JsonFileManager(data_path)
+        self.manager = TaskList(self.file_manager)
     
     def get_option(self):
         show_option = input(show_option_input_message)
@@ -36,9 +38,12 @@ class Interface:
             print(option_error_message)
             
     def add_option(self):
-        data = task_input('Введите значение полей новой задачи')
-        self.manager.add(data)
-        print('Задача успешно добавлена')
+        data = task_input('Введите значение полей новой задачи', all_required=True)
+        if data:
+            self.manager.add(data)
+            print('Задача успешно добавлена')
+        else: 
+            clean_console()
         
     
     def change_option(self):
@@ -51,8 +56,9 @@ class Interface:
             print('Статус задачи успешно изменен')
         elif change_option == '2':
             data = task_input(change_task_fields_message)
-            self.manager.change(id, data)
-            print('Поля задачи успешно изменены.')
+            if data:
+                self.manager.change(id, data)
+                print('Поля задачи успешно изменены.')
         elif change_option == '3':
             clean_console()
         else:
@@ -83,11 +89,11 @@ class Interface:
         if setting_option == '1':
             new_path = input('Введите путь до новой директории: ')
             all_data = self.file_manager.read()
-            new_file_manager = FileManager(new_path)
+            new_file_manager = JsonFileManager(new_path)
             new_file_manager.write(all_data)
             os.remove(self.data_path)
             self.file_manager = new_file_manager
-            self.manager = TaskManager(new_file_manager)
+            self.manager = TaskList(new_file_manager)
             self.data_path = new_path
         elif setting_option == '2':
             print('Смена типа в процессе разработки')

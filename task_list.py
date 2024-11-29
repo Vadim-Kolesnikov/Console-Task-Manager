@@ -1,4 +1,8 @@
 import json
+from utils.task_list_utils import *
+
+status_choices = ['Выполнена', 'Не выполнена']
+priority_choices = ['Высокий', 'Низкий', 'Средний']
 
 class Task:
     def __init__(self, data):
@@ -11,22 +15,19 @@ class Task:
         self.status = data["status"]
 
     def show(self):
+        status = status_choices[int(self.status)-1]
+        priority = priority_choices[int(self.priority)-1]
         st = f'''\n{self.title}
+Идентификатор: {self.id}
 Описание: {self.description};
 Категория: {self.category};
 Дата: {self.due_date};
-Приоритет: {self.priority};
-Статус: {self.status};\n'''
+Приоритет: {priority};
+Статус: {status};\n'''
         print(st)
 
 
-def convert(data):
-    if type(data) == list:
-        return [Task(task) for task in data]
-    return [Task(data)]
-
-
-class FileManager:
+class JsonFileManager:
     def __init__(self, file_path):
         self.file_path = file_path
 
@@ -45,9 +46,8 @@ class FileManager:
     def write(self, data):
         with open(self.file_path, "w") as file:
             json.dump(data, file)
-
-
-class TaskManager:
+    
+class TaskList:
     def __init__(self, file_manager):
         self.file_manager = file_manager
 
@@ -67,6 +67,8 @@ class TaskManager:
 
     def add(self, task):
         tasks = self.file_manager.read()
+        new_task_id = gen_id(tasks)
+        task['id'] = new_task_id
         tasks.append(task)
         self.file_manager.write(tasks)
 
