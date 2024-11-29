@@ -1,10 +1,13 @@
 import os
 
-def clean_console():
+# функция для очистки консоли
+def clean_console() -> None:
     os.system('cls' if os.name == 'nt' else 'clear')
     
 
-def search_data_path():
+# функция ищет в текущей директории файлы
+# с расширением .json 
+def search_data_path() -> str:
     listdir = os.listdir()
     data_path = None
     for path in listdir:

@@ -1,6 +1,5 @@
 from task_list import TaskList, JsonFileManager
 from utils.input_utils import *
-from utils.task_list_utils import show_tasks
 from utils.system_utils import clean_console
 import os
 
@@ -13,31 +12,34 @@ option_error_message = 'Такой опции не существует.'
 setting_option_input_message = 'Выберите что хотите изменить (1 - директорию; 2 - тип сохраняемых данных): '
 
 class TaskManager:
-    def __init__(self, data_path):
+    def __init__(self, data_path: str) -> None:
         self.data_path = data_path
         self.file_manager = JsonFileManager(data_path)
         self.manager = TaskList(self.file_manager)
     
-    def get_option(self):
+    def get_option(self) -> None:
         show_option = input(show_option_input_message)
         if show_option == '1':
             tasks = self.manager.get()
-            show_tasks(tasks)
+            for task in tasks:
+                task.show()
         elif show_option == '2':
             category = input('Введите категорию: ')
             tasks = self.manager.get(category=category)
-            show_tasks(tasks)
+            for task in tasks:
+                task.show()
         elif show_option == '3':
-            id = input('Введите id задачи: ')
-            tasks = self.manager.get(id=id)
-            show_tasks(tasks)
+            task_id = input('Введите id задачи: ')
+            tasks = self.manager.get(task_id=task_id)
+            for task in tasks:
+                task.show()
         elif show_option == '4':
             clean_console()
         else:
             clean_console()
             print(option_error_message)
             
-    def add_option(self):
+    def add_option(self) -> None:
         data = task_input('Введите значение полей новой задачи', all_required=True)
         if data:
             self.manager.add(data)
@@ -46,7 +48,7 @@ class TaskManager:
             clean_console()
         
     
-    def change_option(self):
+    def change_option(self) -> None:
         id = input('Введите id задачи, которую хотите изменить: ')
         change_option = input(change_option_input_message)
         if change_option == '1':
@@ -65,11 +67,11 @@ class TaskManager:
             clean_console()
             print(option_error_message)
             
-    def delete_option(self):
+    def delete_option(self) -> None:
         delete_option = input(delete_option_input_message)
         if delete_option == '1':
-            id = input('Введите id задачи: ')
-            self.manager.delete(id=id)
+            task_id = input('Введите id задачи: ')
+            self.manager.delete(task_id=task_id)
             print('Задача успешно удалена')
         elif delete_option == '2':
             category = input('Введите категорию: ')
@@ -81,7 +83,7 @@ class TaskManager:
             clean_console()
             print(option_error_message)
             
-    def settings_option(self):
+    def settings_option(self) -> None:
         print(f'Текущая директория для хранения данных: {self.data_path}')
         print(f'Текущий тип сохраняемых дынных: {'json'}')
         
@@ -100,7 +102,7 @@ class TaskManager:
         else:
             print(option_error_message)
             
-    def start(self):
+    def start(self) -> None:
         clean_console()
         print('Привет!')
         while True:
