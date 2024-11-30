@@ -1,8 +1,12 @@
 from task_manager import TaskManager
-from utils.system_utils import search_data_path
+from utils.system import find_file_info
 
-data_path = search_data_path()
-        
-interface = TaskManager(data_path)
 
-interface.start()
+
+file_info = find_file_info()
+
+if file_info:
+    interface = TaskManager(file_info[0], file_info[1])
+    interface.start()
+else:
+    print('После исправления повторно запустите программу.')

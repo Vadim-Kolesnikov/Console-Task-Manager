@@ -1,5 +1,5 @@
 from datetime import datetime
-
+from settings import status_choices, priority_choices, file_type_choices
 
 
 
@@ -17,7 +17,7 @@ def str_validate_input(str_name: str, required: bool = False) -> None | str:
 
 # функция для запроса дедлайна задачи
 def date_validate_input(required: bool = False) -> None | str:
-    str_date = input('Введите дату в формате dd.mm.yyyy')
+    str_date = input('Введите дату в формате dd.mm.yyyy: ')
     
     if required:
         while True:
@@ -25,12 +25,12 @@ def date_validate_input(required: bool = False) -> None | str:
                 date = datetime.strptime(str_date, "%d.%m.%Y")
                 if date < datetime.today():
                     print('Дедлайн не может быть установлен на прошедшую дату')
-                    str_date = input('Введите дату в формате ')
+                    str_date = input('Введите дату в формате dd.mm.yyyy: ')
                     continue
                 break
             except:
                 print('Введите корректную дату, либо exit, если хотите вернуться в меню')
-                str_date = input('Введите дату в формате ')
+                str_date = input('Введите дату в формате dd.mm.yyyy: ')
                 if str_date == 'exit':
                     return None
     else:
@@ -39,12 +39,12 @@ def date_validate_input(required: bool = False) -> None | str:
                 date = datetime.strptime(str_date, "%d.%m.%Y")
                 if date < datetime.today():
                     print('Дедлайн не может быть установлен на прошедшую дату')
-                    str_date = input('Введите дату в формате dd.mm.yyyy или пустую строку')
+                    str_date = input('Введите дату в формате dd.mm.yyyy или пустую строку: ')
                     continue
                 break
             except:
                 print('Введите корректную дату, либо exit, если хотите вернуться в меню')
-                str_date = input('Введите дату в формате dd.mm.yyyy или пустую строку')
+                str_date = input('Введите дату в формате dd.mm.yyyy или пустую строку: ')
                 if str_date == 'exit':
                     return None
             
@@ -88,32 +88,32 @@ def task_input(message: str, all_required : bool = False) -> dict | None:
     dct = {}
    
     title = str_validate_input('название задачи', required=all_required)
-    if not title:
+    if not title and title != '':
         return None
     dct['title'] = title
         
     description = str_validate_input('описание задачи', required=all_required)
-    if not description:
+    if not description and description != '':
         return None
     dct['description'] = description
 
     category = str_validate_input('категорию задачи', required=all_required)
-    if not category:
+    if not category and category != '':
         return None
     dct['category'] = category
 
     due_date = date_validate_input(required=all_required)
-    if not due_date:
+    if not due_date and due_date != '':
         return None
     dct['due_date'] = due_date
 
-    priority = choice_validate_input('приоритет задачи', ['Высокий', 'Низкий', 'Средний'], required=all_required)
-    if not priority:
+    priority = choice_validate_input('приоритет задачи', priority_choices, required=all_required)
+    if not priority and priority != '':
         return None
     dct['priority'] = priority
 
-    status = choice_validate_input('статус задачи', ['Выполнена', 'Не выполнена'], required=all_required)
-    if not status:
+    status = choice_validate_input('статус задачи', status_choices, required=all_required)
+    if not status and status != '':
         return None
     dct['status'] = status
 
