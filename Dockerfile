@@ -1,11 +1,11 @@
 FROM python
 
-WORKDIR /task_manager
+WORKDIR /src
 
 ENV TERM=xterm
 
 COPY requirements.txt ./
 
-COPY /task_manager ./
+COPY /src ./
 
 RUN pip install -r requirements.txt

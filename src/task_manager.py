@@ -1,7 +1,7 @@
-from task_manager.task_list import TaskList, show_tasks
+from task_list import TaskList, show_tasks
 from utils.system import JsonFileManager, CsvFileManager, clean_console
 from utils.input import *
-from task_manager.settings import *
+from settings import *
 import os
 import random as rd
 

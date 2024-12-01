@@ -1,6 +1,6 @@
 from utils.test import gen_test_tasks, gen_file_manager
-from task_manager.task_list import *
-from task_manager.settings import TEST_CSV_FILE_NAME, TEST_JSON_FILE_NAME
+from task_list import *
+from settings import TEST_CSV_FILE_NAME, TEST_JSON_FILE_NAME
 
 
 
