@@ -1,5 +1,5 @@
 from datetime import datetime
-from task_manager.settings import *
+from settings import *
 
 
 

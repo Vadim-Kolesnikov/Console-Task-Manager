@@ -1,5 +1,5 @@
 from utils.system import JsonFileManager, CsvFileManager
-from task_manager.settings import STATUS_CHOICES, PRIORITY_CHOICES
+from settings import STATUS_CHOICES, PRIORITY_CHOICES
 from utils.task_list import *
 
 
