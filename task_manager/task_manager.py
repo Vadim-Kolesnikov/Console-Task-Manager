@@ -1,7 +1,7 @@
-from task_list import TaskList, show_tasks
+from task_manager.task_list import TaskList, show_tasks
 from utils.system import JsonFileManager, CsvFileManager, clean_console
 from utils.input import *
-from settings import *
+from task_manager.settings import *
 import os
 import random as rd
 
@@ -45,7 +45,7 @@ class TaskManager:
             task["status"] = rd.randint(0, len(STATUS_CHOICES) - 1)
             tasks.append(task)
         self.file_manager.write(tasks)
-        print('Генерация прошлла успешно')
+        print('Генерация прошла успешно')
          
     def get_option(self) -> None:
         '''Опция получения задачи/задач'''
