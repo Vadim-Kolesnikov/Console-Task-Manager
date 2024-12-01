@@ -1,39 +1,16 @@
 from utils.system import JsonFileManager, CsvFileManager
-from settings import status_choices, priority_choices
-
-
-def prep_text(text, string_len):
-    words = text.split(' ')
-    strings = []
-    string = '| '
-    for word in words:
-        if len(string + word + " ") >= (string_len - 1):
-            if len(string) < (string_len - 1):
-                string += ' ' * (string_len - 1 - len(string))
-            string += '|'
-            strings.append(string)
-            string = '| '
-        string += word + " " 
-    if not string.endswith('|'):
-        if len(string) < (string_len - 1):
-            string += ' ' * (string_len - 1 - len(string))
-        string += '|'
-    strings.append(string)
-    return '\n'.join(strings)
+from settings import STATUS_CHOICES, PRIORITY_CHOICES
+from utils.task_list import *
 
 
 
 
-# функция генерации id задачи
-def gen_task_id(tasks: list[dict]) -> str:
-    ids = [int(task['id']) for task in tasks]
-    if len(ids) == 0:
-        return '0'
-    return str(max(ids) + 1)
-
-
-# класс для более комфортного взаимодействия со словарями (задачами)
 class Task:
+    '''
+    Класс для более комфортного
+    взаимодействия со словарями (задачами)
+    '''
+
     def __init__(self, data: dict) -> None:
         self.id = data["id"]
         self.title = data["title"]
@@ -43,11 +20,39 @@ class Task:
         self.priority = data["priority"]
         self.status = data["status"]
 
-    # функция выведения информации о задаче в консоль
-    def show(self, str_ln: int) -> None:
-        status = status_choices[int(self.status)-1]
-        priority = priority_choices[int(self.priority)-1]
-  
+    def __eq__(self, other):
+        '''
+        Метод переопределен дабы проверка
+        в тестах работа корректно
+        '''
+        
+        if isinstance(other, Task):
+            if not (self.id == other.id):
+                return False
+            if not (self.title == other.title):
+                return False
+            if not (self.description == other.description):
+                return False
+            if not (self.category == other.category):
+                return False
+            if not (self.due_date == other.due_date):
+                return False
+            if not (self.priority == other.priority):
+                return False
+            if not (self.status == other.status):
+                return False
+            return True
+        return False
+
+    def __str__(self) -> None:
+        '''
+        Метод переопределен для 
+        удобства вывода задачи в консоль
+        '''
+
+        status = STATUS_CHOICES[int(self.status)-1]
+        priority = PRIORITY_CHOICES[int(self.priority)-1]
+        str_ln = 30
         sep_char = '-'
         side_char = '|'
         st = f'''
@@ -66,41 +71,25 @@ class Task:
 {side_char}{(str_ln - 2) * sep_char}{side_char}
 {prep_text("Статус: " + status, str_ln)}
 +{(str_ln - 2) * sep_char}+'''
-        print(st)
+        return st
 
 
-def show_tasks(tasks: list[Task], message: str = 'Задачи:') -> None:
-    if len(tasks) > 0:
-        print(message)
-        for task in tasks:
-            task.show(30)
-        print('\n')
-    else:
-        print('\nНичего не найдено\n')
-
-def is_key_word_in_task(task: dict, key_word_list: list[str]) -> bool:
-    task_fields = ['title', 'description', 'categoru']
-    
-    for field in task_fields:
-        field_words = [word.strip().lower() for word in task[field].split(' ')]
-        for key_word in key_word_list:
-            if key_word in field_words:
-                return True
-        
-    return False
-
-
-
-
-# класс для взаимодействия с базой данных (в данном случае с файлом .json/.csv)
 class TaskList:
+    '''
+    Класс для взаимодействия с базой данных 
+    (в данном случае с файлом .json/.csv)
+    '''
+    
     def __init__(self, file_manager: JsonFileManager | CsvFileManager) -> None:
         self.file_manager = file_manager
 
-    # возращает все записанные задачи, если не переданы никакие аргументы
-    # если передан "task_id", вовращается задача с соответствующим id
-    # если передан "category", возвращаются задачи соответвующей категории
     def get(self, task_id: None | str = None, category: None | str = None) -> list[Task]:
+        '''
+        Возращает все записанные задачи, если не переданы никакие аргументы
+        если передан "task_id", вовращается задача с соответствующим id
+        если передан "category", возвращаются задачи соответвующей категории
+        '''
+
         tasks = self.file_manager.read()
         if task_id:
             for task in tasks:
@@ -114,17 +103,19 @@ class TaskList:
             return [Task(task) for task in category_tasks]
         return [Task(task) for task in tasks]
 
+    def add(self, task: dict, is_gen_task_id: bool = True) -> None:
+        '''Добавляет задачу в базу данных'''
 
-    # добавляет задачу в базу данных
-    def add(self, task: dict) -> None:
         tasks = self.file_manager.read()
-        new_task_task_id = gen_task_id(tasks)
-        task['id'] = new_task_task_id
+        if is_gen_task_id:
+            new_task_id = gen_task_id(tasks)
+            task['id'] = new_task_id
         tasks.append(task)
         self.file_manager.write(tasks)
 
-    # изменяет задачу
     def change(self, task_id: str, data: dict) -> None:
+        '''Изменяет задачу'''
+
         tasks = self.file_manager.read()
         for task in tasks:
             if int(task['id']) == int(task_id):
@@ -135,10 +126,13 @@ class TaskList:
                 self.file_manager.write(tasks)
                 break
 
-    # удаляет все записанные задачи, если не переданы никакие аргументы (не готово еще)
-    # если передан "task_id", удаляется задача с соответствующим id
-    # если передан "category", удаляются задачи соответвующей категории
     def delete(self, task_id: str | None = None, category: str | None = None) -> None:
+        '''
+        Удаляет все записанные задачи, если не переданы никакие аргументы (не готово еще)
+        если передан "task_id", удаляется задача с соответствующим id
+        если передан "category", удаляются задачи соответвующей категории
+        '''
+
         tasks = self.file_manager.read()
         if task_id:
             for task in tasks:
@@ -155,6 +149,11 @@ class TaskList:
     def search(self, key_words: str | None = None, 
                categories: str | None = None,
                status: str | None = None) -> list[Task]:
+        '''
+        Находит задачи 
+        по категориям / ключевым словам / статусу
+        '''
+
         tasks = self.file_manager.read()
         if key_words:
             searched_tasks = []
@@ -162,8 +161,8 @@ class TaskList:
             for task in tasks:
                 if is_key_word_in_task(task, key_list):
                     searched_tasks.append(task)
-            return searched_tasks
-        elif key_words:
+            return [Task(task) for task in searched_tasks]
+        elif categories:
             category_list = [cat.strip().lower() for cat in categories.split(' ')]
             category_tasks = []
             for task in tasks:
@@ -176,4 +175,3 @@ class TaskList:
                 if task['status'] == status:
                     status_tasks.append(task)
             return [Task(task) for task in status_tasks]
-        

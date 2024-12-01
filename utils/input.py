@@ -1,10 +1,12 @@
 from datetime import datetime
-from settings import status_choices, priority_choices, file_type_choices
+from settings import *
 
 
 
-# функция для запроса значений строковых полей задачи
+
 def str_validate_input(str_name: str, required: bool = False) -> None | str:
+    '''Заправшивает значения строковых полей задачи'''
+
     value = input(f'Введите {str_name}: ')
     if required:
         while len(value) == 0:
@@ -15,8 +17,9 @@ def str_validate_input(str_name: str, required: bool = False) -> None | str:
     return value
 
 
-# функция для запроса дедлайна задачи
 def date_validate_input(required: bool = False) -> None | str:
+    '''Запрашивает дедлайн задачи'''
+
     str_date = input('Введите дату в формате dd.mm.yyyy: ')
     
     if required:
@@ -51,8 +54,9 @@ def date_validate_input(required: bool = False) -> None | str:
     return str_date
 
 
-# функция для запроса полей с фиксированными значениями (статус, приоритет)
 def choice_validate_input(str_name: str, acceptable_values: list[str], required: bool = False) -> None | str:
+    '''Запрашивает поля с фиксированными значениями (статус, приоритет, тип файла)'''
+
     acceptable_values_str = ' '.join([f'{i} - {v};' for i, v in enumerate(acceptable_values, 1)])
     acceptable_values_options = [str(i + 1) for i in range(len(acceptable_values))]
     value = input(f'Введите {str_name} ({acceptable_values_str}): ')
@@ -71,8 +75,9 @@ def choice_validate_input(str_name: str, acceptable_values: list[str], required:
     return value
 
 
-# функция для запроса id
 def id_validate_input(message: str) -> None | str:
+    '''Запращивает id'''
+
     task_id = input(message)
     while not task_id.isdigit():
         print('Введите числовое значение, либо exit, если хотите вернуться в меню')
@@ -82,8 +87,9 @@ def id_validate_input(message: str) -> None | str:
     return task_id    
         
 
-# функция для запроса полей необходимых для создания/изменения задачи
 def task_input(message: str, all_required : bool = False) -> dict | None:
+    '''Запрашивает поля необходимые для создания/изменения задачи'''
+
     print(message)
     dct = {}
    
@@ -107,12 +113,12 @@ def task_input(message: str, all_required : bool = False) -> dict | None:
         return None
     dct['due_date'] = due_date
 
-    priority = choice_validate_input('приоритет задачи', priority_choices, required=all_required)
+    priority = choice_validate_input('приоритет задачи', PRIORITY_CHOICES, required=all_required)
     if not priority and priority != '':
         return None
     dct['priority'] = priority
 
-    status = choice_validate_input('статус задачи', status_choices, required=all_required)
+    status = choice_validate_input('статус задачи', STATUS_CHOICES, required=all_required)
     if not status and status != '':
         return None
     dct['status'] = status

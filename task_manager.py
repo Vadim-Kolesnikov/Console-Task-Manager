@@ -7,9 +7,13 @@ import random as rd
 
 
 
-# основной класс программы, предоставлящий интерфейс
-# для взаимодействия пользователя с задачами
+
 class TaskManager:
+    ''' 
+    Основной класс программы, предоставлящий интерфейс
+    для взаимодействия пользователя с задачами
+    '''
+
     def __init__(self, file_name: str, file_type: str) -> None:
         self.file_name = file_name
         self.file_type = file_type
@@ -24,25 +28,29 @@ class TaskManager:
         return self.file_name + '.' + self.file_type
     
     def gen_tasks(self) -> None:
+        '''
+        Метод создает и записывает список задач,
+        необходим только для тестирования
+        '''
+
         tasks = []
-        for i in range(0, len(task_names)):
+        for i in range(0, len(TEST_TASK_NAMES)):
             task = {}
             task['id'] = str(i)
-            task["title"] = task_names[i]
-            task["description"] = task_descriptions[i]
-            task["category"] = task_categories[i]
+            task["title"] = TEST_TASK_NAMES[i]
+            task["description"] = TEST_TASK_DESCRIPTIONS[i]
+            task["category"] = TEST_TASK_CATEGORIES[i]
             task["due_date"] = '22.04.2025'
-            task["priority"] = rd.randint(0, len(priority_choices) - 1)
-            task["status"] = rd.randint(0, len(status_choices) - 1)
+            task["priority"] = rd.randint(0, len(PRIORITY_CHOICES) - 1)
+            task["status"] = rd.randint(0, len(STATUS_CHOICES) - 1)
             tasks.append(task)
         self.file_manager.write(tasks)
         print('Генерация прошлла успешно')
          
-        
-    
-    # опция получения задачи/задач
     def get_option(self) -> None:
-        show_option = input(show_option_input_message)
+        '''Опция получения задачи/задач'''
+
+        show_option = input(SHOW_OPTION_INPUT_MESSAGE)
         if show_option == '1':
             tasks = self.task_list.get()
             clean_console()
@@ -61,10 +69,11 @@ class TaskManager:
             clean_console()
         else:
             clean_console()
-            print(option_error_message)
+            print(OPTION_ERROR_MESSAGE)
     
-    # опция добавления задачи
     def add_option(self) -> None:
+        '''Опция добавления задачи'''
+
         data = task_input('Введите значение полей новой задачи', all_required=True)
         if data:
             self.task_list.add(data)
@@ -72,18 +81,19 @@ class TaskManager:
         else: 
             clean_console()
         
-    # опция изменения задачи
     def change_option(self) -> None:
+        '''Опция изменения задачи'''
+
         task_id = id_validate_input('Введите id задачи, которую хотите изменить: ')
         if task_id:
-            change_option = input(change_option_input_message)
+            change_option = input(CHANGE_OPTION_INPUT_MESSAGE)
             if change_option == '1':
-                status = choice_validate_input('статус', status_choices, required=True)
+                status = choice_validate_input('статус', STATUS_CHOICES, required=True)
                 data = {'status': status}
                 self.task_list.change(task_id, data)
                 clean_console('Статус задачи успешно изменен')
             elif change_option == '2':
-                data = task_input(change_task_fields_message)
+                data = task_input(CHANGE_TASK_FIELDS_MESSAGE)
                 if data:
                     self.task_list.change(task_id, data)
                     clean_console('Поля задачи успешно изменены.')
@@ -91,11 +101,12 @@ class TaskManager:
                 clean_console()
             else:
                 clean_console()
-                print(option_error_message)
+                print(OPTION_ERROR_MESSAGE)
 
-    # опция удаления задачи/задач    
     def delete_option(self) -> None:
-        delete_option = input(delete_option_input_message)
+        '''Опция удаления задачи/задач'''
+
+        delete_option = input(DELETE_OPTION_INPUT_MESSAGE)
         if delete_option == '1':
             task_id = id_validate_input('Введите id задачи: ')
             if task_id:
@@ -109,10 +120,12 @@ class TaskManager:
             clean_console()
         else:
             clean_console()
-            print(option_error_message)
+            print(OPTION_ERROR_MESSAGE)
 
     def search_option(self) -> None:
-        search_option = input(search_option_input_message)
+        '''Опция поиска'''
+
+        search_option = input(SEARCH_OPTION_INPUT_MESSAGE)
         if search_option == '1':
             key_words = input('Введите ключевые слова через пробел: ')
             tasks = self.task_list.search(key_words=key_words)
@@ -131,19 +144,20 @@ class TaskManager:
                 show_tasks(tasks)
         else:
             clean_console()
-            print(option_error_message)
+            print(OPTION_ERROR_MESSAGE)
             
-    # опция настроек программы
     def settings_option(self) -> None:
+        '''Опция настроек программы'''
+
         print(f'Текущая директория для хранения данных: {self.file_path}')
         print(f'Текущий тип сохраняемых данных: {self.file_type}')
         
-        setting_option = input(setting_option_input_message)
+        setting_option = input(SETTING_OPTION_INPUT_MESSAGE)
         if setting_option == '1':
             
-            new_file_type_ind = choice_validate_input('тип данных', file_type_choices, required=True)
+            new_file_type_ind = choice_validate_input('тип данных', FILE_TYPE_CHOICES, required=True)
             if new_file_type_ind:
-                new_file_type = file_type_choices[int(new_file_type_ind) - 1]
+                new_file_type = FILE_TYPE_CHOICES[int(new_file_type_ind) - 1]
                 if new_file_type == self.file_type:
                     print('Данный тип данных используется в данный момент')
                 else:
@@ -161,15 +175,16 @@ class TaskManager:
                     self.task_list = TaskList(new_file_manager)
                     print('Тип данных успешно изменен')
             else:
-                print(option_error_message)
+                print(OPTION_ERROR_MESSAGE)
             
-    # основной
     def start(self) -> None:
+        '''Запускает основной цикл'''
+
         clean_console()
         print('Привет!')
         while True:
-            print(option_list_message)
-            option = input(option_input_message)
+            print(OPTION_LIST_MESSAGE)
+            option = input(OPTION_INPUT_MESSAGE)
             clean_console()
             if option == '0':
                 self.gen_tasks()
@@ -189,5 +204,5 @@ class TaskManager:
                 break
             else:
                 clean_console()
-                print(option_error_message)
+                print(OPTION_ERROR_MESSAGE)
         print('До новых встреч!')
